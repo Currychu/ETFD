@@ -2,9 +2,12 @@ name: 每週執行 ETF 配息抓取
 
 on:
   schedule:
-    # 這裡設定為台灣時間每週一早上 8 點執行 (UTC 時間為 0 點)
     - cron: '0 0 * * 1'
-  workflow_dispatch: # 允許在網頁上手動點擊執行
+  workflow_dispatch:
+
+# 加入這段環境變數設定，提前切換至 Node.js 24 來消除警告
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build:
@@ -26,6 +29,12 @@ jobs:
 
     - name: 執行 Python 程式
       run: python main.py
+
+    - name: 將產出的 Excel 檔上傳至 Actions 供下載
+      uses: actions/upload-artifact@v4
+      with:
+        name: ETF_Dividend_Data
+        path: ETF_Full_Synced_Final_2026.xlsx
 
     - name: 將產出的 Excel 檔上傳至 Actions 供下載
       uses: actions/upload-artifact@v4
