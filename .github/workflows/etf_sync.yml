@@ -1,14 +1,20 @@
 name: 每週執行 ETF 配息抓取
+
 on:
   schedule:
     - cron: '0 0 * * 1'
   workflow_dispatch:
-# 加入這段環境變數設定，提前切換至 Node.js 24 來消除警告
+
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    # 賦予寫入權限，機器人才有權力把檔案存回你的儲存庫
+    permissions:
+      contents: write
+
     steps:
     - name: 取得儲存庫程式碼
       uses: actions/checkout@v4
@@ -17,13 +23,23 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
+
     - name: 安裝所需套件
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+
     - name: 執行 Python 程式
       run: python main.py
 
+    - name: 自動將產出的 Excel 存回儲存庫首頁
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add ETF_Full_Synced_Final_2026.xlsx
+        # 如果檔案沒變動，就不執行 commit 免得報錯
+        git commit -m "自動更新 ETF 配息資料: $(date +'%Y-%m-%d')" || exit 0
+        git push
     - name: 將產出的 Excel 檔上傳至 Actions 供下載
       uses: actions/upload-artifact@v4
       with:
