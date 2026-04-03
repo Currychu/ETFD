@@ -35,9 +35,3 @@ jobs:
       with:
         name: ETF_Dividend_Data
         path: ETF_Full_Synced_Final_2026.xlsx
-
-    - name: 將產出的 Excel 檔上傳至 Actions 供下載
-      uses: actions/upload-artifact@v4
-      with:
-        name: ETF_Dividend_Data
-        path: ETF_Full_Synced_Final_2026.xlsx
